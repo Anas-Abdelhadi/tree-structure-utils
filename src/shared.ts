@@ -1,11 +1,11 @@
-export type { ITreeManager } from './domain/meta/i-tree-manager'
+export type { ITree  } from './domain/meta/i-tree'
 
 import { App, defineAsyncComponent } from 'vue'
 
-import { TreeManager } from './domain/TreeManager'
+import { TreeManager } from './domain/tree'
 
 const install = (app:App<Element>)=>{
     app.component('VTree',defineAsyncComponent(()=>import('./components/tree.vue')))
 }
     
-export { TreeManager , install}
+export {TreeManager  , install}

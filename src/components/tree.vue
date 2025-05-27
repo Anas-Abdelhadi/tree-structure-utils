@@ -2,7 +2,7 @@
   <component :is="tag" class="tree-node" v-bind="resolveNodeAttrs(treeManager)">
     <slot :node="treeManager"></slot>
     <component :is="childrenWrapperTag" v-bind="childrenWrapperAttrs">
-      <Tree v-for="(child, index) in treeManager.children" :treeManager="child" :nodeAttrs :childrenWrapperTag :childrenWrapperAttrs :tag :key="index" v-bind="attrs">
+      <Tree v-for="(child, index) in treeManager.data.children" :treeManager="child" :nodeAttrs :childrenWrapperTag :childrenWrapperAttrs :tag :key="index" v-bind="attrs">
         <template #default="slotProps">
           <slot v-bind="slotProps" />
         </template>
@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { TreeManager } from '@/shared'
+import { TreeManager } from '../domain/tree'
 import { useAttrs } from 'vue'
 
 const props = withDefaults(
@@ -26,7 +26,7 @@ const props = withDefaults(
   { tag: 'div', childrenWrapperTag: 'div', childrenWrapperAttrs: () => ({ id: 'children' }), nodeAttrs: () => () => ({}) }
 )
 
-// Infer the actual data type from TreeManager
+// Infer the actual data type fromTreeManager
 type TreeDataType = typeof props.treeManager extends TreeManager<infer T> ? T : never
 
 defineSlots<{
