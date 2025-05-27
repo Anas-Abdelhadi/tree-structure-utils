@@ -1,8 +1,9 @@
 import type { ITreeManager } from './meta/i-tree-manager'
+import { reactive } from 'vue'
 export class TreeManager<T > {
   data: ITreeManager<T>
   parent?: TreeManager<T>
-  children: TreeManager<T>[] = []
+  children: TreeManager<T>[] = reactive([])
   depth = 0
  
 
@@ -25,6 +26,7 @@ export class TreeManager<T > {
     const newNode = new TreeManager<T>(data)
     newNode.parent = this
     newNode.depth = this.depth + 1
+    this.data.children?.push(data)
     this.children.push(newNode)
     return newNode
   }
@@ -41,6 +43,9 @@ export class TreeManager<T > {
 
     // Add to targetNode's children
     nodeToAdd.depth = this.depth + 1
+    console.warn("RUBBISH");
+    
+    targetNode.data.children?.push(nodeToAdd.data)
     targetNode.children.push(nodeToAdd)
     nodeToAdd.updateChildDepths()
     return true
@@ -54,6 +59,7 @@ export class TreeManager<T > {
     }
     node.parent = this
     node.depth = this.depth + 1
+    this.data.children?.push(node.data)
     this.children.push(node)
     node.updateChildDepths()
     return true
@@ -72,7 +78,7 @@ export class TreeManager<T > {
     //if the children doesn't exist
     const index = parent.children.indexOf(node)
     if (index === -1) return false
-
+    parent.data.children?.splice(index,1)
     parent.children.splice(index, 1)
     node.parent = undefined
     node.depth = 0

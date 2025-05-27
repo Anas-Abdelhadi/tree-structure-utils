@@ -21,7 +21,7 @@ const props = withDefaults(
     childrenWrapperAttrs?: Record<string, any>
     tag?: string
     treeManager: TreeManager<T>
-    nodeAttrs?: (manager: TreeManager<T>) => Record<string, any>
+    nodeAttrs?: (manager: TreeManager<T>, attrs: any, props: any) => Record<string, any>
   }>(),
   { tag: 'div', childrenWrapperTag: 'div', childrenWrapperAttrs: () => ({ id: 'children' }), nodeAttrs: () => () => ({}) }
 )
@@ -33,8 +33,10 @@ defineSlots<{
   default(props: { node: TreeManager<TreeDataType> }): any
 }>()
 const attrs = useAttrs()
+console.log('attrs', attrs)
+
 const resolveNodeAttrs = (manager: TreeManager<T>) => {
-  return { ...attrs, ...(props.nodeAttrs?.(manager) || {}) }
+  return { ...attrs, ...(props.nodeAttrs?.(manager, attrs, props) || {}) }
 }
 </script>
 <style scoped>
