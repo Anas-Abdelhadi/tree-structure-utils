@@ -75,7 +75,7 @@ export class TreeManager<T> {
   toJSONFormat(): any {
     return {
       ...this.data,
-      children: this.data?.children?.map(child => child?.toJSONFormat?.())
+      children: (this.data?.children as any[])?.map(child => child?.toJSONFormat?.())
     }
   }
   getParentChain() {
