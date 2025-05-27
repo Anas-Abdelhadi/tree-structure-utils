@@ -14,4 +14,9 @@ const treeManager = new TreeManager({
   title: 'ROOT',
   children: [{ title: 'CHILD 1 0' }, { title: 'CHILD 0', children: [{ title: 'CHILD 0 0' }, { title: 'CHILD 0 1' }] }, { title: 'CHILD 1', children: [{ title: 'CHILD 1 0' }, { title: 'CHILD 1 1' }] }]
 })
+// debugger
+// const a = treeManager.data.children[0]
+// const aa = a.remove()
+// treeManager.data.children[0].addNode(aa.data)
+// console.log(treeManager.data)
 </script>

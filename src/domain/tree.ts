@@ -63,12 +63,12 @@ export class TreeManager<T> {
   }
 
   remove(node:TreeManager<T> = this) {
-    const removed = node.parent?.data.children?.splice(node.index, 1) as unknown as undefined |TreeManager<T>
+    const [removed] = node.parent?.data.children?.splice(node.index, 1) as unknown as  TreeManager<T>[]
     if (!removed) return undefined
     node.parent && updateIndices(node.parent, removed?.index)
     removed.parent = undefined
     removed.index = 0
-    return removed
+    return removed 
   }
 
   //---------------------- Return tree data in JSON format ------------------
