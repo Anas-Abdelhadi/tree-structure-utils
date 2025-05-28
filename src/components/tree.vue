@@ -33,7 +33,6 @@ defineSlots<{
   default(props: { node: TreeManager<TreeDataType> }): any
 }>()
 const attrs = useAttrs()
-console.log('attrs', attrs)
 
 const resolveNodeAttrs = (manager: TreeManager<T>) => {
   return { ...attrs, ...(props.nodeAttrs?.(manager, attrs, props) || {}) }
