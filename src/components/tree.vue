@@ -2,7 +2,7 @@
   <component :is="tag" class="tree-node" v-bind="resolveNodeAttrs(treeManager)">
     <slot :node="treeManager"></slot>
     <component :is="childrenWrapperTag" v-bind="childrenWrapperAttrs">
-      <Tree v-for="(child, index) in treeManager.children" :treeManager="child" :nodeAttrs :childrenWrapperTag :childrenWrapperAttrs :tag :key="index" v-bind="attrs">
+      <Tree v-for="(child, index) in treeManager.children" :treeManager="child" :nodeAttrs :childrenWrapperTag :childrenWrapperAttrs :tag v-bind="attrs" :key="index">
         <template #default="slotProps">
           <slot v-bind="slotProps" />
         </template>

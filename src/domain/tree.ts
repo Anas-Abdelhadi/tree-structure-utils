@@ -1,9 +1,9 @@
-import { ITree, ITreeManager } from './meta/i-tree'
-import { isReactive, reactive, shallowReactive } from 'vue'
+import { ITree, ITreeManager } from './meta/i-tree';
+import { isReactive, reactive } from 'vue';
 
 const updateIndices = <T>(node: TreeManager<T>, start = 0) => {
   ;(node.children as unknown as TreeManager<T>[])?.forEach((x, i) => {
-    i > start && (x.index = i)
+    i >= start && (x.index = i)
   })
 }
 const setDepth = <T>(node: TreeManager<T>) => {
@@ -14,7 +14,7 @@ const toJSON = <T>(node: TreeManager<T>): ITree<T> => ({ ...node.data, children:
 
 export class TreeManager<T> implements ITreeManager<T> {
   data: T
-  children: TreeManager<T>[] = shallowReactive([])
+  children: TreeManager<T>[] = reactive([])
   private _parent: undefined | TreeManager<T>
   private _depth = 0
   index: number = 0
