@@ -1,9 +1,9 @@
 {
-  "name": "node-base-tree",
+  "name": "cubes-tree",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/node-base-tree.js",
+  "main": "dist/cubes-tree.js",
   "types": "dist/shared.d.ts",
   "files": [
     "dist"
@@ -15,21 +15,23 @@
     "test": "vitest"
   },
   "dependencies": {
+    "corello": "^0.1.1",
+    "immer": "^10.1.1",
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.3",
-    "@vue/tsconfig": "^0.7.0",
-    "typescript": "~5.8.3",
-    "vite": "^6.3.5",
-    "vue-tsc": "^2.2.8",
     "@types/node": "^22.14.1",
+    "@vitejs/plugin-vue": "^5.2.3",
     "@vitest/coverage-v8": "^3.1.2",
     "@vitest/ui": "^3.1.2",
     "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
     "jsdom": "^26.1.0",
+    "tslib": "^2.8.1",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
     "vite-plugin-dts": "^4.5.3",
     "vitest": "^3.1.2",
-    "tslib": "^2.8.1"
+    "vue-tsc": "^2.2.8"
   }
 }

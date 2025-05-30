@@ -1,2 +1,7 @@
-
- 
+.children {
+  padding-left: 10px;
+}
+.tree-node {
+  display: flex;
+  justify-content: space-between;
+}

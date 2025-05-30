@@ -1,4 +1,4 @@
-export type { ITree  } from './domain/meta/i-tree'
+export type { ITree  } from './domain/i-tree'
 
 import { App, defineAsyncComponent } from 'vue'
 

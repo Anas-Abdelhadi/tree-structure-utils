@@ -1,30 +1,87 @@
-import { ITree, ITreeManager } from './meta/i-tree';
-import { isReactive, reactive } from 'vue';
+import { Base } from './base'
+import { ITree } from './i-tree'
+import { shallowReactive } from 'vue'
 
-const updateIndices = <T>(node: TreeManager<T>, start = 0) => {
-  ;(node.children as unknown as TreeManager<T>[])?.forEach((x, i) => {
-    i >= start && (x.index = i)
-  })
-}
+const updateIndices = <T>(node: TreeManager<T>, start = 0) => node.children?.forEach((x, i) => i >= start && (x.index = i))
+
 const setDepth = <T>(node: TreeManager<T>) => {
   node.depth = node.parent ? node.parent.depth + 1 : 0
-  ;(node.children as []).forEach(setDepth)
+  node.children?.forEach(setDepth)
 }
-const toJSON = <T>(node: TreeManager<T>): ITree<T> => ({ ...node.data, children: node.children.map(toJSON) })
 
-export class TreeManager<T> implements ITreeManager<T> {
-  data: T
-  children: TreeManager<T>[] = reactive([])
-  private _parent: undefined | TreeManager<T>
+const toJSON = <T>(node:  TreeManager<T>): ITree<T> =>  ({ ...node.state.value, children: node.children?.map(toJSON) })
+
+const addNode = <T>(owner: TreeManager<T>, data: ITree<T> | TreeManager<T>, index = -1, isInit = false): TreeManager<T> => {
+  const newNode = data instanceof TreeManager ? data : new TreeManager<T>(data)
+  if (index >= 0) {
+    // if this is an insert update siblings at higher indices..
+    newNode.index = index
+
+    owner.update(p => {
+      p.children === undefined && (p.children=[])
+      p.children?.splice(index, isInit ? 1 : 0, newNode.state.value)
+    })
+    owner.children.splice(index, isInit ? 1 : 0, newNode )
+
+    !isInit && updateIndices(owner, index)
+  } else if (index === -1) {
+    newNode.index = owner.state.value.children?.length || 0
+    if (!isInit) {
+      owner.update(p => {
+        p.children === undefined && (p.children=[])
+        p.children!.push(newNode.state.value)
+      })
+      owner.children.push(newNode )
+    }
+  }
+  newNode.parent = owner as any
+  return newNode
+}
+
+const remove = <T>(node: TreeManager<T>): TreeManager<T> | undefined => {
+  node.parent?.update(p => {
+    p.children?.splice(node.index, 1)
+  })
+  const removed = node.parent?.children?.splice(node.index, 1)
+  if (!removed) return undefined
+  node.parent && updateIndices(node.parent as any, removed[0].index)
+  removed[0].parent = undefined
+  removed[0].index = 0
+  return removed[0]
+}
+
+const getParentChain = <T>(owner:  TreeManager<T>) => {
+  const p = [] as any[]
+  if (!owner.parent) return p
+  p.push(...getParentChain(owner.parent), owner.parent)
+  return p
+}
+ 
+
+export class TreeManager<T> extends Base<ITree<T>> {
   private _depth = 0
-  index: number = 0
-
+  private _index = 0
+  private _parent: undefined | TreeManager<T>
+  private _children = shallowReactive([]) as TreeManager<T>[]
   get parent(): undefined | TreeManager<T> {
     return this._parent
   }
-  set parent(p: TreeManager<T> | undefined) {
-    this._parent = p
+  set parent(parent: TreeManager<T> | undefined) {
+    this._parent = parent
     setDepth(this)
+  }
+  get index() {
+    return this._index
+  }
+  set index(v: number) {
+    this._index = v
+  }
+  get data(){
+    const {children, ...rest} = this.state.value
+    return rest
+  }
+  get children() {
+    return this._children
   }
   get depth() {
     return this._depth
@@ -33,53 +90,33 @@ export class TreeManager<T> implements ITreeManager<T> {
     this._depth = v
   }
 
-  constructor({ children, ...data } = { children: [] } as ITree<T>) {
-    this.data = isReactive(data) ? data : reactive(data as any)
-    children?.forEach((x, index) => this.addNode(x, index, true))
+  constructor(initState = { children: [] } as ITree<T>) {
+    super(initState)
+    debugger
+    initState.children?.forEach((x, index) => this.addNode(x, index, true))
   }
 
-  addNode(data: ITree<T> | ITreeManager<T>, index = -1, isInit = false) {
-    const newNode = data instanceof TreeManager ? data: new TreeManager<T>(data as ITree<T>)
-
-    if (index >= 0) {
-      // if this is an insert update siblings at higher indices..
-      newNode.index = index
-
-      this.children?.splice(index, isInit ? 1 : 0, newNode as any)
-      !isInit && updateIndices(this, index)
-    } else if (index === -1) {
-      newNode.index = this.children!.length
-      !isInit && this.children?.push(newNode)
-    }
-    newNode.parent = this
-    return newNode
+  addNode(data: ITree<T> | TreeManager<T>, index = -1, isInit = false):  TreeManager<T> {
+    return addNode(this, data, index, isInit)
   }
 
-  addNodes(data: (ITree<T>| ITreeManager<T>)[]) {
+  addNodes(data: (ITree<T> | TreeManager<T>)[]): TreeManager<T>[] {
     return data.map((x, i) => this.addNode(x, i))
   }
-  removeNodes(data: TreeManager<T>[]) {
+
+  removeNodes(data: TreeManager<T>[]): (TreeManager<T> | undefined)[] {
     return data.map(this.remove)
   }
 
-  remove(node: TreeManager<T> = this) {
-    const [removed] = node.parent?.children?.splice(node.index, 1) as TreeManager<T>[]
-    if (!removed) return undefined
-    node.parent && updateIndices(node.parent, removed?.index)
-    removed.parent = undefined
-    removed.index = 0
-    return removed
+  remove(node: TreeManager<T> = this as any): TreeManager<T> | undefined {
+    return remove(node as any)
   }
 
-  //---------------------- Return tree data in JSON format ------------------
-
-  toJSON(node = this) {
+  toJSON(node = this as any):  ITree<T>  {
     return toJSON(node)
   }
+
   getParentChain() {
-    const p = [] as any[]
-    if (!this.parent) return p
-    p.push(...this.parent.getParentChain(), this.parent)
-    return p
+    return getParentChain(this as any)
   }
 }
