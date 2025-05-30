@@ -1,6 +1,6 @@
 <template>
-  <TreeView :treeManager v-slot="{ node, data }" :childrenWrapperAttrs="{ class: 'children' }">
-    <div class="tree-node">
+  <TreeView :treeManager v-slot="{ node, data }" class="tree" :subtreeAttrs="{ id: 'children' }">
+    <div class="tree-content">
       <span> {{ data.title }} [{{ node.children.length }}] </span>
       <div>
         <button @click="move(node)">MOVE</button>
@@ -20,12 +20,10 @@ const treeManager = new TreeManager({
 })
 
 const move = (node: typeof treeManager) => {
-  // debugger
-
   const bb = node.remove()
-
   bb && treeManager.addNode(bb)
 }
+
 const add = (node: typeof treeManager) => {
   node.addNode({ title: `${Math.random()}` })
   console.log(treeManager)
